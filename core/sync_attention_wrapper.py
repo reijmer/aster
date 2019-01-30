@@ -49,9 +49,11 @@ class SyncAttentionWrapper(seq2seq.AttentionWrapper):
         rnn_cell_state = state.cell_state.h
       else:
         rnn_cell_state = state.cell_state
-      attention, alignments = _compute_attention(
+
+      attention, alignments, _ = _compute_attention(
           attention_mechanism, rnn_cell_state, previous_alignments[i],
           self._attention_layers[i] if self._attention_layers else None)
+
       alignment_history = previous_alignment_history[i].write(
           state.time, alignments) if self._alignment_history else ()
 
@@ -69,7 +71,8 @@ class SyncAttentionWrapper(seq2seq.AttentionWrapper):
         cell_state=next_cell_state,
         attention=attention,
         alignments=self._item_or_tuple(all_alignments),
-        alignment_history=self._item_or_tuple(all_histories))
+        alignment_history=self._item_or_tuple(all_histories),
+        attention_state=self._item_or_tuple(all_alignments))
     
     if self._output_attention:
       return attention, next_state
